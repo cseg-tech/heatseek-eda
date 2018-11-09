@@ -14,3 +14,4 @@ Exploratory Data Analysis for HeatSeek
 
 ## Contributors
 * Jake Lee, @jakehlee
+* Daniel Jaroslawicz, @djaroslawicz
