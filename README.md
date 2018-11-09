@@ -1,5 +1,5 @@
 # heatseek-eda
-Exploratory Data Analysis for HeatSeek
+Exploratory Data Analysis for Heat Seek
 
 ## Notes
 
