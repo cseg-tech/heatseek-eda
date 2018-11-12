@@ -10,7 +10,15 @@ Exploratory Data Analysis for Heat Seek
 
 ## Scripts
 
-### No scripts yet!
+### scrub.py
+* `Usage: python scrub.py raw_input clean_output`
+* Removes potentially identifiable information from the directly exported dataset for analysis.
+
+### per_user.py
+* `Usage: python per_user.py dataset output_dir/`
+* Separates aggregate data into datasets for individual users.
+* Also includes `user_import(filepath)`, a function for importing the dataset per-user.
+* `from per_user import user_import`
 
 ## Contributors
 * Jake Lee, @jakehlee
