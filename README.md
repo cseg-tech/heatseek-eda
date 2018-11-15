@@ -23,3 +23,4 @@ Exploratory Data Analysis for Heat Seek
 ## Contributors
 * Jake Lee, @jakehlee
 * Daniel Jaroslawicz, @djaroslawicz
+* Justin Won, @1jinwoo
