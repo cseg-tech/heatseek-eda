@@ -1,0 +1,19 @@
+User IDs of people with incomplete data from:
+data/2018-2019 data pt 2_ Feb 01 2019 to May 31 2019.csv608
+564
+561
+560
+569
+485
+410
+443
+User IDs of people with incomplete data from:
+data/2018-2019 data pt 1_Oct 01 2018 to Jan 31 2019.csv569
+509
+401
+387
+443
+446
+447
+448
+410
