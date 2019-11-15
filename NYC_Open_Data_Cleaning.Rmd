@@ -1,0 +1,125 @@
+---
+title: "Heatseek NYC DB - Cleaning Script"
+author: "Jolene Lim"
+date: "13 November 2019"
+output: html_document
+---
+# Setup
+```{r, warning = FALSE, message = FALSE}
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+```
+
+# Load Heatseek Data
+```{r, message = FALSE}
+df = read_csv("data/heatseek_geocoded.csv", progress = FALSE)
+```
+
+```{r}
+# create users df which only contains unique users, sum of the violations, and has house number and street extracted
+users = df %>%
+  group_by(user_id, address, zip_code, apartment) %>%
+  summarize(n_violations = sum(violation)) %>%
+  filter(!is.na(user_id)) %>%
+  mutate(house_no = str_extract(address, "^(\\S)+(?=\\s)"))
+
+# clean street names to format in NYC DB
+street = str_split(users$address, pattern = " ") %>%
+  map_chr(function(x) str_c(x[-1], collapse = " ")) %>%
+  str_to_upper() %>%
+  str_replace("^E ", "EAST ") %>%
+  str_replace("^W ", "WEST ") %>%
+  str_replace("(?<=[0-9])TH ", " ") %>%
+  str_replace("(?<=[0-9])RD ", " ") %>%
+  str_replace(" ST(?![:alpha:])", " STREET")
+
+# add clean street name to users
+users$street = street
+```
+
+```{r}
+zips = unique(users$zip_code)
+```
+
+# Load Complaint Data
+```{r, message = FALSE}
+# load complaint data, filter for those with zip codes matching our users
+comp = read_csv("data/Housing_Maintenance_Code_Complaints.csv")
+
+complaints = comp %>%
+  filter(Zip %in% zips)
+```
+
+```{r}
+# join by Apt No., Post Code and House Number
+hs_complaints = left_join(users, complaints, by = c("zip_code" = "Zip", 
+                                                    "apartment" = "Apartment",
+                                                    "house_no" = "HouseNumber"))
+```
+
+At this point, hs_complaints has all types of complaints, not just those relating to heat. Further filter to those specific to heat.
+Another NYC DB, has the complaint problems associated with each complaint ID. Use that to further filter.
+
+```{r, message = FALSE}
+# Load Complaint Problems
+problems = read_csv("data/Complaint_Problems.csv", progress = FALSE)
+```
+
+```{r}
+# filter for heat-related problems
+problems = problems %>%
+  select(ComplaintID, CodeID, Code) %>%
+  filter(str_detect(Code, "NO HEAT"))
+```
+
+```{r}
+complaint_ids = unique(problems$ComplaintID)
+```
+
+Finally, get `hs_complaints` relating to heat.
+```{r}
+hs_complaints = hs_complaints %>%
+  filter(ComplaintID %in% complaint_ids)
+```
+
+Additional check that the street names match (since we did not join by streetname, on the off-chance that zip code, house number and apt matches, a complaint from a different street could be joined).
+```{r, message = FALSE}
+hs_complaints %>%
+  filter(street != StreetName) %>%
+  select(user_id, street, StreetName) %>%
+  kable() %>% kable_styling() %>% scroll_box(height = "300px")
+```
+Quick scroll suggests they are the same, just a result of poor initial cleaning.
+
+# Load Violations Data
+```{r, message = FALSE, warning = FALSE}
+violations = read_csv("data/Housing_Maintenance_Code_Violations.csv", progress = FALSE)
+
+violations = filter(violations, Postcode %in% zips) %>%
+  filter(str_detect(NOVDescription, "SECTION 27-2029"))
+```
+
+```{r}
+hs_violations = inner_join(users, violations, by = c("zip_code" = "Postcode",
+                                                    "house_no" = "HouseNumber",
+                                                    "apartment" = "Apartment"))
+
+hs_violations %>%
+  select(user_id, address, zip_code, apartment, NOVDescription, InspectionDate) %>%
+  kable() %>% kable_styling() %>% scroll_box(height = "300px")
+```
+
+Quick check for street names
+```{r, message = FALSE}
+hs_violations %>%
+  filter(street != StreetName) %>%
+  select(user_id, street, StreetName) %>%
+  kable() %>% kable_styling()
+```
+
+# Export the complaints and violations records for users
+```{r}
+write_excel_csv(hs_complaints, "data/heatseek_complaints.csv")
+write_excel_csv(hs_violations, "data/heatseek_violations.csv")
+```

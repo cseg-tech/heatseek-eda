@@ -1,0 +1,97 @@
+---
+title: "Heatseek NYC DB - Analysis Script"
+author: "Jolene Lim"
+date: "15 November 2019"
+output: html_document
+---
+
+# Setup
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+```
+
+# Load Data
+```{r, message = FALSE}
+hs = read_csv("data/heatseek_geocoded.csv")
+complaints = read_csv("data/heatseek_complaints.csv")
+violations = read_csv("data/heatseek_violations.csv")
+```
+
+```{r}
+users = hs %>%
+  group_by(user_id, address, zip_code, apartment) %>%
+  summarize(n_violations = sum(violation)) %>%
+  filter(!is.na(user_id))
+```
+
+# COMPLAINTS
+## Question: How many users with violations (recorded by the sensor) filed a complaint in 2019?
+```{r}
+complaints_2019 = complaints %>%
+  filter(str_detect(ReceivedDate, "2019"))
+
+users_who_filed_2019 = unique(complaints_2019$user_id)
+
+users = users %>%
+  mutate(faced_violation = n_violations > 1) %>%
+  mutate(faced_violation = factor(faced_violation, 
+                                  levels = c(TRUE, FALSE),
+                                  labels = c("Faced Violation", "Did Not Face Violation"))) %>%
+  mutate(filed_complaint = user_id %in% users_who_filed_2019) %>%
+  mutate(filed_complaint = factor(filed_complaint, 
+                                  levels = c(TRUE, FALSE),
+                                  labels = c("Filed Complaint", "Did Not File Complaint")))
+```
+
+```{r}
+table(users$faced_violation, users$filed_complaint)
+```
+
+```{r}
+ggplot(users, aes(x = filed_complaint, y = n_violations)) +
+  geom_jitter(width = 0.2) +
+  labs(title = "Whether Users Filed Complaint and the Number of Violations They Faced",
+       x = "Complaint Status",
+       y = "Number of Violations") +
+  theme_minimal()
+```
+
+## Question: For those who did file complaints, were they users who did not file complaints in the last 2 years?
+I.e., did the sensors motivate them to file a complaint? 
+
+```{r}
+users_who_filed = unique(complaints$user_id)
+
+sum(!(users_who_filed_2019 %in% users_who_filed))
+```
+
+There are no such users.
+
+# VIOLATIONS
+## Question: How many users with violations (recorded by the sensor) eventually ended up as a violation case in 2019?
+
+```{r}
+violations_2019 = violations %>%
+  filter(str_detect(NOVIssuedDate, "2019"))
+
+users_who_filedv_2019 = unique(violations_2019$user_id)
+
+users = users %>%
+  mutate(filed_violation = user_id %in% users_who_filedv_2019) %>%
+  mutate(filed_violation = factor(filed_violation, 
+                                  levels = c(TRUE, FALSE),
+                                  labels = c("Filed Violation", "Did Not File Violation")))
+```
+
+```{r}
+table(users$faced_violation, users$filed_violation)
+```
+
+```{r}
+ggplot(users, aes(x = filed_violation, y = n_violations)) +
+  geom_jitter(width = 0.2) +
+  labs(title = "Whether Users Filed Violation and the Number of Violations They Faced",
+       x = "Violation Status",
+       y = "Number of Violations (Detected by Sensor)") +
+  theme_minimal()
+```
