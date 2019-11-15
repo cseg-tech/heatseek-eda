@@ -1,3 +1,4 @@
 /data/*
 .ipynb_checkpoints/*
 api/geocoding_api.txt
+.Rhistory
