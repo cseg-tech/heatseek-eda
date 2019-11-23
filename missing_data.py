@@ -14,7 +14,7 @@ if __name__ == "__main__":
             csv_reader = csv.reader(csv_file, delimiter=',')
 
             f = open("missing_data.txt", "a+")
-            f.write("User IDs of people with incomplete data from:\n" + file)
+            f.write("User IDs of people with incomplete data from:\n" + fileee)
 
             for row in csv_reader:
                 if row[0] not in total_ids:
