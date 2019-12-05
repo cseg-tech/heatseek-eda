@@ -1,21 +1,10 @@
-94 sensors, 14 sensor failures
-6.714285714285714% of sensors failed
+94 sensors, 0 sensor failures
+0% of sensors failed
+
+sensors failed
 
 User IDs of people with incomplete data from:
-
-1_Oct 01 2018 to Jan 31 2019.csv569
-509
-401
-387
-443
-446
-447
-448
-410
-
-
-data/2018-2019 data pt 2_ Feb 01 2019 to May 31 2019.csv608
-564
-561
-560
-485
+data/2018-2019 data pt 1_Oct 01 2018 to Jan 31 2019.csvUser IDs of people with incomplete data from:
+data/2018-2019 data pt 2_ Feb 01 2019 to May 31 2019.csvUser IDs of people with incomplete data from:
+data/2018-2019 data pt 1_Oct 01 2018 to Jan 31 2019.csvUser IDs of people with incomplete data from:
+data/2018-2019 data pt 2_ Feb 01 2019 to May 31 2019.csv
