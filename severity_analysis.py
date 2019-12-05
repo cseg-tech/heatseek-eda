@@ -190,7 +190,11 @@ files = ['./data/2018-2019 data pt 1_Oct 01 2018 to Jan 31 2019.csv', './data/20
 users = import_file(files[0])
 users2 = import_file(files[1])
 datapoints = compute_freq_sevr(users)
+<<<<<<< HEAD
+datapoints2 = compute_freq_sevr(users2)
+=======
 datapoints
+>>>>>>> cef33e851d57a04d9eafdc28e11014f5c99b2533
 
 #matplotlib inline
 import matplotlib.pyplot as plt
@@ -218,5 +222,9 @@ def plot_freq_sevr(datapoints):
     plt.show()
     
 plot_freq_sevr(datapoints)
+<<<<<<< HEAD
+plot_freq_sevr(datapoints2)
+=======
+>>>>>>> cef33e851d57a04d9eafdc28e11014f5c99b2533
             
             
