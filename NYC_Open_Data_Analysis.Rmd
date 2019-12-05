@@ -24,6 +24,10 @@ users = hs %>%
   filter(!is.na(user_id))
 ```
 
+```{r}
+filter(users, n_violations > 1000)
+```
+
 # COMPLAINTS
 ## Question: How many users with violations (recorded by the sensor) filed a complaint in 2019?
 ```{r}
@@ -48,12 +52,33 @@ table(users$faced_violation, users$filed_complaint)
 ```
 
 ```{r}
-ggplot(users, aes(x = filed_complaint, y = n_violations)) +
+ggplot(users, aes(x = filed_complaint, y = n_violations, color = as.factor(faced_violation))) +
   geom_jitter(width = 0.2) +
   labs(title = "Whether Users Filed Complaint and the Number of Violations They Faced",
        x = "Complaint Status",
        y = "Number of Violations") +
+  scale_color_discrete(name = "Sensor Recorded Violation") +
   theme_minimal()
+```
+
+```{r}
+n_complaints = complaints_2019 %>%
+  group_by(user_id) %>%
+  summarize(n_complaints = n())
+
+users = left_join(users, n_complaints) %>%
+  mutate(n_complaints = ifelse(is.na(n_complaints), 0, n_complaints))
+```
+
+```{r}
+ggplot(users, aes(x = n_violations, y = n_complaints, color = filed_complaint)) +
+  geom_point() +
+  labs(title = "Number of Violations Recorded by Sensor v. Number of NYCDB Complaints",
+       x = "Number of Violations Recorded by Sensor",
+       y = "Number of NYCDB Complaints") +
+  scale_color_discrete(name = "Whether User Filed Complaint") +
+  theme_bw()
+
 ```
 
 ## Question: For those who did file complaints, were they users who did not file complaints in the last 2 years?
@@ -69,6 +94,7 @@ There are no such users.
 
 # VIOLATIONS
 ## Question: How many users with violations (recorded by the sensor) eventually ended up as a violation case in 2019?
+Note: Violations count both open and closed
 
 ```{r}
 violations_2019 = violations %>%
@@ -88,10 +114,30 @@ table(users$faced_violation, users$filed_violation)
 ```
 
 ```{r}
-ggplot(users, aes(x = filed_violation, y = n_violations)) +
+ggplot(users, aes(x = filed_violation, y = n_violations, color = faced_violation)) +
   geom_jitter(width = 0.2) +
   labs(title = "Whether Users Filed Violation and the Number of Violations They Faced",
        x = "Violation Status",
        y = "Number of Violations (Detected by Sensor)") +
+  scale_color_discrete(name = "Sensor Recorded Violation") +
   theme_minimal()
+```
+
+```{r}
+n_dbviolations = violations_2019 %>%
+  group_by(user_id) %>%
+  summarize(n_dbviolations = n())
+
+users = left_join(users, n_dbviolations) %>%
+  mutate(n_dbviolations = ifelse(is.na(n_dbviolations), 0, n_dbviolations))
+```
+
+```{r}
+ggplot(users, aes(x = n_violations, y = n_dbviolations, color = filed_violation)) +
+  geom_point() +
+  labs(title = "Number of Violations Recorded by Sensor v. Number of NYCDB Violations",
+       x = "Number of Violations Recorded by Sensor",
+       y = "Number of NYCDB Violations") +
+  scale_color_discrete(name = "Whether User Filed 311 Violation") +
+  theme_bw()
 ```
