@@ -190,7 +190,8 @@ files = ['./data/2018-2019 data pt 1_Oct 01 2018 to Jan 31 2019.csv', './data/20
 users = import_file(files[0])
 users2 = import_file(files[1])
 datapoints = compute_freq_sevr(users)
-datapoints
+datapoints2 = compute_freq_sevr(users2)
+
 
 #matplotlib inline
 import matplotlib.pyplot as plt
@@ -216,7 +217,9 @@ def plot_freq_sevr(datapoints):
     plt.xlabel('frequency (hour / hour)')
     plt.ylabel('severity (degree Fahrenheit / hour)')
     plt.show()
-    
-plot_freq_sevr(datapoints)
-            
-            
+
+if __name__ == "__main__":
+
+    plot_freq_sevr(datapoints)
+
+    plot_freq_sevr(datapoints2)

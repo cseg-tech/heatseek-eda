@@ -20,7 +20,7 @@ if __name__ == "__main__":
                 if row[0] not in total_ids:
                     total_ids.add(row[0])
 
-                if row[6] in (None, "") or row[8] in (None, ""):
+                if row[6] in (None, ""):
 
                     if row[0] not in lines_seen:
                         f.write(row[0])
@@ -33,7 +33,10 @@ if __name__ == "__main__":
         total_ids_num += len(total_ids)
     f = open("missing_data.txt", "r+")
     print(str(total_ids_num) + " sensors, " + str(len(lines_seen)) + " sensor failures", file = f )
-    fails = total_ids_num / len(lines_seen)
+    try:
+        fails = len(lines_seen)/  total_ids_num
+    except:
+        fails = total_ids_num
     print( str(fails) + "% of sensors failed\n", file = f)
 
 
